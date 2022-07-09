@@ -22,11 +22,7 @@ if ($_POST) {
     }
     # code...
 }
-
-
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
