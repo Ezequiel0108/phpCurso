@@ -13,8 +13,8 @@ $conexion->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
 
 $sql= "SELECT * FROM `fotos`";//selecciona todos los campo de fotos
-$sentencia=$conexion->prepare($sql);
-$sentencia->execute();
+$sentencia=$conexion->prepare($sql);//preparo los datos
+$sentencia->execute();//ejecuto los datos
 
 $resultado=$sentencia->fetchAll();
 
@@ -25,8 +25,8 @@ foreach ($resultado as $key ) {//recorre todos
     # code...
 }
 echo "</br>";
-foreach ($resultado as $key ) {
-    print_r($key['nombre']);
+foreach ($resultado as $key ) {//recorre todos y te trae el nombre
+    echo $key['nombre']."</br>";
      # code...
  }
 

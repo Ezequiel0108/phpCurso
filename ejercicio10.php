@@ -1,4 +1,6 @@
 <?php
+
+$valorA="";
 if($_POST){
     $valorA=$_POST['valorA'];
     $valorB=$_POST['valorB'];
@@ -39,6 +41,8 @@ if($_POST){
         <link href="css/style.css" rel="stylesheet">
     </head>
     <body>
+</br>
+    <?php echo $valorA; ?>
     <form action="ejercicio10.php" method="post">
         Valor A:
     <input class="form-control" type="text" name="valorA">
