@@ -15,6 +15,7 @@ if($_POST){
     $objconexion= new conexion(); 
     $sql="INSERT INTO `proyectos` (`id`, `nombre`, `imagen`, `descripcion`) VALUES (NULL, '$nombre', '$archivo', '$descripcion');";
     $objconexion->ejecutar($sql);
+    header("location:portafolio.php");
     //print_r($_POST);
     //print_r($_FILES);
 }
@@ -32,7 +33,7 @@ if($_GET){
     
     $sql="DELETE FROM `proyectos` WHERE `proyectos`.`id` = $id";
     $objconexion->ejecutar($sql);
-    
+    header("location:portafolio.php");
 }
 
 $objconexion= new conexion();
@@ -65,11 +66,11 @@ $proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
                     <div class="card-body">
                         <form enctype="multipart/form-data" action="portafolio.php" method="post">
                         <!-- el isset tiene que ir, o falla-->
-                        Nombre del proyecto: <input value="<?php echo (isset($_POST['nombre'])?$_POST['nombre']:""); ?>" class="form-control" type="text" name="nombre" id="">
+                        Nombre del proyecto: <input required value="<?php echo (isset($_POST['nombre'])?$_POST['nombre']:""); ?>" class="form-control" type="text" name="nombre" id="">
                         </br>
-                        Descripción: <textarea class="form-control" name="descripcion" id="" rows="3"></textarea>
+                        Descripción: <textarea  required class="form-control" name="descripcion" id="" rows="3"></textarea>
                         </br>
-                        imagen del proyecto: <input class="form-control" type="file" name="archivo" id="">
+                        imagen del proyecto: <input  required class="form-control" type="file" name="archivo" id="">
                         </br>
                  
                        

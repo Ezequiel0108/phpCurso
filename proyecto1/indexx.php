@@ -1,4 +1,11 @@
 <?php include "cabecera.php";?>
+<?php include("conexion.php");
+$objconexion= new conexion();
+$proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
+
+$fechaa=date("Y-m-d");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +30,26 @@
             </p>
         </div>
     </div>
+    <?php foreach($proyectos as $proyecto){?>
+        
+        
+    
+    <div class="card mb-3" style="max-width: 540px;">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img  width="100" src=" imagenes/<?php echo $proyecto['imagen'];  ?>" alt="" class="img-fluid rounded-start" >
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title"><?php  echo $proyecto['nombre']?></h5>
+        <p class="card-text"><?php   echo $proyecto['descripcion']?></p>
+        <p class="card-text"><small class="text-muted"><?php  echo $fechaa; ?></small></p>
+      </div>
+    </div>
+  </div>
+</div>
+<?php }?>
+
 </body>
 </html>
 
