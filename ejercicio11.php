@@ -6,6 +6,7 @@ if ($_POST) {
     switch ($boton) {
         case '1':
             # code...
+            
             echo "Presionaste el botón 1";
             break;
         case '2':

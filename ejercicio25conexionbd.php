@@ -2,8 +2,7 @@
 if ($_POST) {
     $nombre=$_POST['nombre'];
     $foto=$_POST['foto'];
-    $id=$_POST['id'];
-    # code...
+    
 }
 
 if ($_POST) {
@@ -16,8 +15,7 @@ $conexion=new PDO("mysql:host=$servidor;dbname=album",$usuario,$contrasenia);
 $conexion->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $sql="INSERT INTO `fotos` (`id`, `nombre`, `ruta`) VALUES (NULL, '$nombre', '$foto');";//Aquí inserto datos pero le paso las variables que mandó el usuario
 $conexion->exec($sql);
-$borrar="DELETE FROM `fotos` WHERE `fotos`.`id` = $id";//este es para borrar datos con la id que pase el usuario
-$conexion->exec($borrar);
+
 
 echo "Conexión establecida";
 
@@ -42,8 +40,7 @@ nombre
 <input   type="text" name="nombre" id="">
 foto
 <input type="text" name="foto" id="">
-borrar
-<input type="text" name="id" id="">
+
 
 
 <input type="submit" value="enviar">
