@@ -1,0 +1,4 @@
+abstracción, 
+encapsulamiento, 
+herencia y 
+polimorfismo.
