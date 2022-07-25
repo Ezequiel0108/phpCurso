@@ -1,7 +1,10 @@
 <?php include "cabecera.php";?>
 <?php include("conexion.php");
-$objconexion= new conexion();
-$proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
+
+$proyectos=$conexion->prepare('SELECT * FROM `proyectos`');
+
+$proyectos->fetchAll();
+$proyectos->execute();
 
 $fechaa=date("Y-m-d");
 ?>

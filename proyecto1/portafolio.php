@@ -1,43 +1,169 @@
 <?php include "cabecera.php";?></br>
 <?php include("conexion.php");?>
 <?php
+$Rimagen="";
+
+
+
+$txtID=(isset($_POST['txtID'])?$_POST['txtID']:"");
+$nombre=(isset($_POST['nombre'])?$_POST['nombre']:"");
+$descripcion=(isset($_POST['descripcion'])?$_POST['descripcion']:"");
+$archivo=(isset($_FILES['archivo']['name'])?$_FILES['archivo']['name']:"");
+$accion=(isset($_POST['accion'])?$_POST['accion']:"");
+
+
+
+        
 if($_POST){
+ 
+       
+    $boton=$_POST['accion'];
 
-    $nombre= $_POST['nombre'];
-    $descripcion= $_POST['descripcion'];
-    $fecha= new DateTime();
-//recibo el nommbre del input "archivo" y luego accedo al nombre
-    $archivo= $fecha->getTimestamp()."_".$_FILES['archivo']['name'];
-    $imagen_temporal=$_FILES['archivo']['tmp_name'];
+    switch ($boton) {
 
-    //Aquí le digo mueve el archivo temporal original al nombre del archivo"
-    move_uploaded_file($imagen_temporal,"imagenes/".$archivo);
-    $objconexion= new conexion(); 
-    $sql="INSERT INTO `proyectos` (`id`, `nombre`, `imagen`, `descripcion`) VALUES (NULL, '$nombre', '$archivo', '$descripcion');";
-    $objconexion->ejecutar($sql);
-    header("location:portafolio.php");
-    //print_r($_POST);
-    //print_r($_FILES);
+        case 'Seleccionar':
+            # code...
+            //echo "seleccionar";
+           
+           
+            $proyect=$conexion->prepare("SELECT * FROM `proyectos` where id=:id");
+            $proyect->bindParam(':id',$txtID);
+            
+            $proyect->execute();
+            
+            $guardar=$proyect->fetch(PDO::FETCH_LAZY);
+           
+             $nombre= $guardar['nombre'];
+           
+            $archivo=$guardar['imagen'];
+           
+             $descripcion= $guardar['descripcion'];
+             
+            break;
+       
+       case 'Modificar':
+       
+            $fecha= new DateTime();
+        //recibo el nommbre del input "archivo" y luego accedo al nombre
+            $archivo= $fecha->getTimestamp()."_".$_FILES['archivo']['name'];
+            $imagen_temporal=$_FILES['archivo']['tmp_name'];
+            move_uploaded_file($imagen_temporal,"imagenes/".$archivo);
+           
+            $imagen=$conexion->prepare("SELECT imagen FROM `proyectos` WHERE id=:id");
+            $imagen->bindParam(':id',$txtID);
+            $imagen->execute();
+            $guardar2=$imagen->fetch(PDO::FETCH_LAZY);
+         
+            
+
+            unlink("imagenes/".$guardar2['imagen']);
+          
+            
+           
+           
+         
+            $sentencia=$conexion->prepare("UPDATE `proyectos` SET `nombre` = :nombre ,`imagen` = :archivo, `descripcion` = :descripcion WHERE `proyectos`.`id` = :id");
+
+            $sentencia->bindParam(':nombre',$nombre);
+            $sentencia->bindParam(':archivo',$archivo);
+            $sentencia->bindParam(':descripcion',$descripcion);
+            $sentencia->bindParam(':id',$txtID);
+            $sentencia->execute();
+            
+            
+        
+
+            break;
+        case 'cancelar':
+                # code...
+                
+            echo "Presionaste cancelar";
+            break; 
+           
+        case 'Enviar info':
+            //Aqui solo muevo la imagen sobre la carpeta
+                $fecha= new DateTime();
+            //recibo el nommbre del input "archivo" y luego accedo al nombre
+                $archivo= $fecha->getTimestamp()."_".$_FILES['archivo']['name'];
+                $imagen_temporal=$_FILES['archivo']['tmp_name'];
+                file_exists("imagenes/".$archivo) ;
+                //Aquí le digo mueve el archivo temporal a la carpeta imagenes mas el nombre del archivo"
+                move_uploaded_file($imagen_temporal,"imagenes/".$archivo);
+               
+                $SSQL=$conexion->prepare("INSERT INTO `proyectos` (`nombre`, `imagen`, `descripcion`) VALUES (:Rnombre, :Rarchivo, :Rdescripcion);");
+                $SSQL->bindParam(':Rnombre',$nombre);
+                $SSQL->bindParam(':Rarchivo',$archivo);
+                $SSQL->bindParam(':Rdescripcion',$descripcion);
+                $SSQL->execute();
+                //header("location:portafolio.php");
+                //print_r($_POST);
+                //print_r($_FILES);
+            break;
+            
+        
+       
+        
+        case 'Borrar':
+            # code...
+            //echo "borrar";
+          
+            //aqui me devuelve el valor de imagen dependiendo de su id
+            $imagen=$conexion->prepare("SELECT imagen FROM `proyectos` WHERE id=:id");
+            $imagen->bindParam(':id',$txtID);
+            $imagen->execute();
+            $guardar2=$imagen->fetch(PDO::FETCH_LAZY);
+         
+            if (file_exists("imagenes/".$guardar2['imagen'])){
+
+            unlink("imagenes/".$guardar2['imagen']);}
+          
+            
+            $sent=$conexion->prepare("DELETE FROM `proyectos` WHERE `proyectos`.`id` =:id");
+            $sent->bindParam(':id',$txtID);
+            $sent->execute();
+            
+           
+            break;
+        }
+
+        //print_r($txtID);
+
 }
+
+
+
+/*
 if($_GET){
+         
     //DELETE FROM `proyectos` WHERE `proyectos`.`id` = 8
     $id=$_GET['borrar'];
     $objconexion= new conexion();
     //aqui me devuelve el valor de imagen dependiendo de su id
     $imagen=$objconexion->consultar("SELECT imagen FROM `proyectos` WHERE id=$id");
    //aquí leo el array 0 y lo que contiene imagen
-    //print_r($imagen[0]['imagen']);
+   // print_r($imagen);//Array ( [0] => Array ( [imagen] => 1658591293_img1.jpeg [0] => 1658591293_img1.jpeg ) )
+   //print_r($imagen[0]['imagen']);[0] => 1658591293_img1.jpeg 
     //borra
    unlink("imagenes/".$imagen[0]['imagen']);
    
-    
     $sql="DELETE FROM `proyectos` WHERE `proyectos`.`id` = $id";
     $objconexion->ejecutar($sql);
-    header("location:portafolio.php");
-}
+    //header("location:portafolio.php");
+    //$Rarchivo=(isset($_FILES['archivo']['name'])?$_FILES['archivo']['name']:"");
+//print_r($Rarchivo);
+    //DELETE FROM `proyectos` WHERE `proyectos`.`id` = 8
+  
+    //header("location:portafolio.php");
+}*/
 
-$objconexion= new conexion();
-$proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
+
+$sentenciaSQL=$conexion->prepare("SELECT * FROM proyectos");
+$sentenciaSQL->execute();
+$proyectos=$sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
+
+
+
+
 
 //print_r($proyectos);
 ?>
@@ -64,25 +190,31 @@ $proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
                         Datos del proyecto
                     </div>
                     <div class="card-body">
-                        <form enctype="multipart/form-data" action="portafolio.php" method="post">
+                        <form enctype="multipart/form-data" action="" method="post">
                         <!-- el isset tiene que ir, o falla-->
-                        Nombre del proyecto: <input required value="<?php echo (isset($_POST['nombre'])?$_POST['nombre']:""); ?>" class="form-control" type="text" name="nombre" id="">
+                        <input type="" name="txtID" id="txtID" value="<?php echo (isset($txtID)?$txtID:""); ?>" > 
+                        Nombre del proyecto: <input  value="<?php echo (isset($nombre)?$nombre:""); ?>" class="form-control" type="text" name="nombre" id="">
                         </br>
-                        Descripción: <textarea  required class="form-control" name="descripcion" id="" rows="3"></textarea>
+                        Descripción: <textarea  value=""  class="form-control" name="descripcion" id="" rows="3"><?php echo (isset($descripcion)?$descripcion:""); ?></textarea>
                         </br>
-                        imagen del proyecto: <input  required class="form-control" type="file" name="archivo" id="">
+                        imagen del proyecto: <?php echo (isset($archivo)?$archivo:""); ?> <input   value="" class="form-control" type="file" name="archivo" id="">
                         </br>
                  
                        
                    
                      
-                        <input class="btn btn-success" type="submit" value="Enviar info">
+                        <input class="btn btn-success" type="submit" name="accion" value="Enviar info">
+                      
+                        <input  class="btn btn-success black-text yellow" type="submit" name="accion" value="Modificar">
+                        <input  class="btn btn-success red" type="submit" name="accion" value="cancelar">
 
                         </form>
                     </div>
     
                 </div>      
             </div>
+  
+   
             <div class="col-md-6">
                 <table class="table">
                     <thead>
@@ -96,24 +228,36 @@ $proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
                         </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($proyectos as $proyecto){ ?>
+                    <?php foreach($proyectos as $proyecto){ ?>
+                    
+                                
+                        
+                        
+                        
                         <tr>
-                            <td><?php echo $proyecto['id'];  ?></td>
+                            <td><?php echo $proyecto['id'];      ?></td>
                             <td><?php echo $proyecto['nombre'];  ?></td>
-                            <td>
+                            <td> <img  width="100" src=" imagenes/<?php echo $proyecto['imagen'];?> ">  </td>
+                           <!-- <td>
                              
-                                
-                                    <img  width="100" src=" imagenes/<?php echo $proyecto['imagen'];  ?>" alt=""/>
-                                   
-                          
-                                
-                                
-                            </div>
+                                    <img  width="100" src=" imagenes<?php// echo $proyecto['imagen'];  ?>" alt=""/> 
+                                    
+                           
                             
-                            </td>
+                            </td>-->
                             
                             <td><?php echo $proyecto['descripcion'];  ?></td>
-                            <td><a  class="btn btn-danger" href="?borrar=<?php echo $proyecto['id']; ?>" >Eliminar</a></td>
+
+                            <td>
+                                                              <!--<a  class="btn btn-danger" href="?borrar=<?php //echo $proyecto['id']; ?>" >Borrar</a>-->
+                                <form action="" method="post">
+                                <input type="hidden" name="txtID" id="txtID" value="<?php echo $proyecto['id'];?>" >   
+                                <input class="btn blue" type="submit" name="accion" value="Seleccionar" id="">
+                           
+                                <input class="btn btn-danger" type="submit" value="Borrar" name="accion">
+                               
+                                </form>
+                            </td>
                         </tr><!--el signo interrogacion antes de borrar hace que no me redirija a esa url-->
                     <?php };?>
                       
@@ -121,9 +265,9 @@ $proyectos=$objconexion->consultar('SELECT * FROM `proyectos`');
                     </tbody>
                 </table>
             </div>
-            
-        </div>
-    </div>
+            </div>
+    </div>     
+     
 
 
    
