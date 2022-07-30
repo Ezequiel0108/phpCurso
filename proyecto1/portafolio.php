@@ -34,10 +34,16 @@ if($_POST){
             $guardar=$proyect->fetch(PDO::FETCH_LAZY);
            
              $nombre= $guardar['nombre'];
-           
-            $archivo=$guardar['imagen'];
-           
              $descripcion= $guardar['descripcion'];
+            
+             $imagen=$conexion->prepare("SELECT imagen FROM `proyectos` WHERE id=:id");
+             $imagen->bindParam(':id',$txtID);
+             $imagen->execute();
+             $guardar2=$imagen->fetch(PDO::FETCH_LAZY);
+ 
+            $archivo= $guardar2['imagen'];
+            
+             
              
             break;
        
@@ -53,14 +59,8 @@ if($_POST){
             $imagen->bindParam(':id',$txtID);
             $imagen->execute();
             $guardar2=$imagen->fetch(PDO::FETCH_LAZY);
-         
-            
 
             unlink("imagenes/".$guardar2['imagen']);
-          
-            
-           
-           
          
             $sentencia=$conexion->prepare("UPDATE `proyectos` SET `nombre` = :nombre ,`imagen` = :archivo, `descripcion` = :descripcion WHERE `proyectos`.`id` = :id");
 
@@ -70,14 +70,20 @@ if($_POST){
             $sentencia->bindParam(':id',$txtID);
             $sentencia->execute();
             
-            
+            header("location:portafolio.php");
         
 
             break;
         case 'cancelar':
-                # code...
+           
+            $nombre=(isset($_POST['nombre'])?"":"");
+            $descripcion=(isset($_POST['descripcion'])?"":"");
+            $archivo=(isset($_FILES['archivo']['name'])?"":"");
                 
             echo "Presionaste cancelar";
+            // el headder es otra forma pero cuando lo uso me pide el valor imagen para enviar ya que tiene un required
+           // header("Location:portafolio.php");
+
             break; 
            
         case 'Enviar info':
@@ -95,7 +101,7 @@ if($_POST){
                 $SSQL->bindParam(':Rarchivo',$archivo);
                 $SSQL->bindParam(':Rdescripcion',$descripcion);
                 $SSQL->execute();
-                //header("location:portafolio.php");
+                header("location:portafolio.php");
                 //print_r($_POST);
                 //print_r($_FILES);
             break;
@@ -121,7 +127,7 @@ if($_POST){
             $sent=$conexion->prepare("DELETE FROM `proyectos` WHERE `proyectos`.`id` =:id");
             $sent->bindParam(':id',$txtID);
             $sent->execute();
-            
+            header("location:portafolio.php");
            
             break;
         }
@@ -192,21 +198,23 @@ $proyectos=$sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <form enctype="multipart/form-data" action="" method="post">
                         <!-- el isset tiene que ir, o falla-->
-                        <input type="" name="txtID" id="txtID" value="<?php echo (isset($txtID)?$txtID:""); ?>" > 
-                        Nombre del proyecto: <input  value="<?php echo (isset($nombre)?$nombre:""); ?>" class="form-control" type="text" name="nombre" id="">
+                        <input type="hidden" name="txtID" id="txtID" value="<?php echo (isset($txtID)?$txtID:""); ?>" > 
+                        Nombre del proyecto: <input   required value="<?php echo (isset($nombre)?$nombre:""); ?>" class="form-control" type="text" name="nombre" id="">
                         </br>
-                        Descripción: <textarea  value=""  class="form-control" name="descripcion" id="" rows="3"><?php echo (isset($descripcion)?$descripcion:""); ?></textarea>
+                        Descripción: <textarea  value="" required  class="form-control" name="descripcion" id="" rows="3"><?php echo (isset($descripcion)?$descripcion:""); ?></textarea>
                         </br>
-                        imagen del proyecto: <?php echo (isset($archivo)?$archivo:""); ?> <input   value="" class="form-control" type="file" name="archivo" id="">
+                        imagen del proyecto: <img width="50" src="imagenes/<?php echo $archivo?>" alt="">  
+                       
+                       <input   value="" required class="form-control" type="file" name="archivo" id="">
                         </br>
                  
                        
                    
                      
-                        <input class="btn btn-success" type="submit" name="accion" value="Enviar info">
+                        <input <?php echo ($accion=="Seleccionar ")?"disabled":"";  ?> class="btn btn-success" type="submit" name="accion" value="Enviar info">
                       
-                        <input  class="btn btn-success black-text yellow" type="submit" name="accion" value="Modificar">
-                        <input  class="btn btn-success red" type="submit" name="accion" value="cancelar">
+                        <input <?php //echo ($accion=="Seleccionar")?"disabled":"";  ?> class="btn btn-success black-text yellow" type="submit" name="accion" value="Modificar">
+                        <input <?php //echo ($accion=="Seleccionar")?"disabled":"";  ?> class="btn btn-success red" type="submit" name="accion" value="cancelar">
 
                         </form>
                     </div>
